@@ -1,19 +1,25 @@
 import { Exercises } from "@/interface/ExcerciseResponse";
 import { Transcription } from "@/interface/TranscriptionResponse";
 import { create } from "zustand";
+import { RefObject } from "react";
 
 type AudioState = {
   audioFile: File | null;
   audioUrl: string | null;
   currentTime: number;
   currentWordIndex: number;
-  exercises: Exercises; // Assuming exercises is an array, adjust type as needed
+  exercises: Exercises;
   duration: number;
   isPlaying: boolean;
   isProcessing: boolean;
   transcriptionData: Transcription | null;
   isGeneratingExercises: boolean;
-  setExercises: (exercises: Exercises) => void; // Adjust type as needed
+
+  // Nuevo: referencia al audio
+  audioRef: RefObject<HTMLAudioElement | null> | null;
+
+  // Acciones existentes
+  setExercises: (exercises: Exercises) => void;
   setIsGeneratingExercises: (isGenerating: boolean) => void;
   setTranscriptionData: (data: Transcription | null) => void;
   setIsProcessing: (isProcessing: boolean) => void;
@@ -23,9 +29,13 @@ type AudioState = {
   setAudioUrl: (url: string | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setCurrentWordIndex: (index: number) => void;
+
+  // Nuevas acciones
+  setAudioRef: (ref: RefObject<HTMLAudioElement | null>) => void;
+  jumpToTime: (time: number) => void;
 };
 
-export const useAudioState = create<AudioState>((set) => ({
+export const useAudioState = create<AudioState>((set, get) => ({
   audioFile: null,
   audioUrl: null,
   currentTime: 0,
@@ -36,6 +46,9 @@ export const useAudioState = create<AudioState>((set) => ({
   transcriptionData: null,
   isGeneratingExercises: false,
   exercises: { grammar: [], writing: [] },
+  audioRef: null,
+
+  // Acciones existentes
   setExercises: (exercises) => set({ exercises }),
   setIsGeneratingExercises: (isGenerating) =>
     set({ isGeneratingExercises: isGenerating }),
@@ -47,4 +60,14 @@ export const useAudioState = create<AudioState>((set) => ({
   setAudioFile: (file) => set({ audioFile: file }),
   setAudioUrl: (url) => set({ audioUrl: url }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
+
+  // Nuevas acciones
+  setAudioRef: (ref) => set({ audioRef: ref }),
+  jumpToTime: (time) => {
+    const { audioRef } = get();
+    if (audioRef?.current) {
+      audioRef.current.currentTime = time;
+      set({ currentTime: time });
+    }
+  },
 }));

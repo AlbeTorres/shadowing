@@ -3,11 +3,17 @@ import { useAudioState } from '@/store/AudioState';
 
 export const Transcription = () => { 
 
-    const { transcriptionData, currentWordIndex } = useAudioState();
+    const { transcriptionData,  jumpToTime } = useAudioState();
 
     if(!transcriptionData) {
         return null; // If no transcription data, don't render anything
     }
+
+    const handleWordClick = (startTime:number) => {
+  // Función que actualice el tiempo del audio y el estado
+  jumpToTime(startTime);
+}
+    
 
 
     return ( <div className="bg-white rounded-xl shadow-lg p-6">
@@ -16,15 +22,12 @@ export const Transcription = () => {
                   Transcripción
                 </h2>
                 <div className="prose max-w-none">
-                  <p className="text-lg leading-relaxed">
+                  <p className="text-lg leading-relaxed text-gray-800">
                     {transcriptionData?.transcription.map((item, index) => (
                       <span
                         key={index}
-                        className={`transition-all duration-300 ${
-                          index === currentWordIndex
-                            ? 'bg-yellow-200 font-semibold text-blue-800 px-1 py-0.5 rounded'
-                            : ''
-                        }`}
+                         onClick={() => handleWordClick(item.start)}
+  className="cursor-pointer hover:bg-blue-100 hover:text-blue-600 rounded px-1"
                       >
                         {item.text}{' '}
                       </span>
