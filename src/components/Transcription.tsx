@@ -3,20 +3,12 @@ import { useAudioState } from '@/store/AudioState';
 
 export const Transcription = () => { 
 
-    const { transcriptionData, currentTime } = useAudioState();
+    const { transcriptionData, currentWordIndex } = useAudioState();
 
     if(!transcriptionData) {
         return null; // If no transcription data, don't render anything
     }
 
-     const getCurrentWord = () => {
-    if (!transcriptionData) return -1;
-    return transcriptionData.transcription.findIndex(item => 
-      currentTime >= item.start && currentTime <= item.end
-    );
-  };
-
-    const currentWordIndex = getCurrentWord();
 
     return ( <div className="bg-white rounded-xl shadow-lg p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">

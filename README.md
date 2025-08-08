@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Requierments
 
-## Getting Started
+el usuario sube un audio a la app (mp3, mp4, wav)
 
-First, run the development server:
+permitir videos y enlaces de youtube
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+la app obtiene la trasncripcion del audio al acceder a una IA que recibe el audio y retorna la misma en un json(retorna, transcripcion en formato timestap, asi como una lista de las palabras del vocabulario, asi como la tematica del audio)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+la app muestra un repdoductor done el uduario escucha su audio y una seccion donde esta toda la transcripcion en forma de texto que el usuario puede leer al mismo tiempo que escucha
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Mientras se reproduce se remarca la palabra que se esta escuchando en la reproduccion asi el usuario puede ver por donde va el texto(no funciona bien posponer)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+el reproductor tiene la opcion de avanzar o retroceder el audio
 
-## Learn More
+cuando el usuario hace click en una palabra del texto el audio se mueve hasta ese momento donde se menciona
 
-To learn more about Next.js, take a look at the following resources:
+el usuario tiene un boton para iniciar una grabacion y leer en voz alta, su audio se pone disponble para que lo escuche y se le da una puntuacion teniendo en cuenta la clarida y la pronuciacion asi como las veces que se detiene
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+cuando se toca una palabra ver como hacer para que la api de google translate te envie la pronunciacion de la misma asi como su significado, decidir entre esto y lo de rebobinar , no se cual es mejor
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ademas hay una seccion donde se muetra la lista de palabras de vocabulario de ese audio en la que el usuario debe fijarse
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+existe un boton qe genera ejercicios de gramatica y escritura basandose en la tematica del audio( esto debe ser oro llamado a la IA con los datos tematica y vocabulario y el prom)

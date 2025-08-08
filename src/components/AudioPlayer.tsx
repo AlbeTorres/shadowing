@@ -1,6 +1,7 @@
 import { Play, Pause,  Volume2, } from 'lucide-react';
 import { useAudioState } from '@/store/AudioState';
 import { useRef } from 'react';
+import {  findCurrentWordBinary } from '@/util/findCurrentWordOptimized';
 
 
 
@@ -8,9 +9,9 @@ export const AudioPlayer=()=>{
 
 
 const audioRef = useRef<HTMLAudioElement | null>(null);
-    const {duration,audioFile, isPlaying, setIsPlaying, setCurrentTime, setDuration, currentTime, audioUrl} = useAudioState()
+    const {isProcessing,duration,audioFile, isPlaying, setIsPlaying, setCurrentTime, setDuration, currentTime, audioUrl,transcriptionData, currentWordIndex, setCurrentWordIndex} = useAudioState()
 
-    if (!audioFile || !audioUrl) {
+    if (!audioFile || !audioUrl  || isProcessing) {
     return null; // If no audio URL is set, don't render the player
   }
 
@@ -27,7 +28,18 @@ const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
+      const newTime= audioRef.current.currentTime;
+      setCurrentTime(newTime);
+
+        // OPTIMIZACIÓN: Solo buscar si tenemos transcripción
+    if (transcriptionData?.transcription) {
+      const newWordIndex = findCurrentWordBinary(newTime,  transcriptionData.transcription);
+      
+      // Solo actualizar si cambió la palabra (no el tiempo)
+      if (newWordIndex !== currentWordIndex) {
+        setCurrentWordIndex(newWordIndex);
+      }
+    }
     }
   };
 

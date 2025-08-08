@@ -4,7 +4,12 @@ import { PenTool } from 'lucide-react';
 
 export const GenerateExercises=()=>{
     
-    const { setExercises ,setIsGeneratingExercises,isGeneratingExercises, transcriptionData } = useAudioState();
+    const {isProcessing, setExercises, audioFile, audioUrl ,setIsGeneratingExercises,isGeneratingExercises, transcriptionData } = useAudioState();
+
+      if (!audioFile || !audioUrl || isProcessing) {
+    return null; // If no audio URL is set, don't render the player
+  }
+
 
     const generateExercises = async () => {
     if (!transcriptionData) return;

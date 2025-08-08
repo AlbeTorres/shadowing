@@ -7,6 +7,7 @@ import { Transcription } from '@/components/Transcription';
 import { Vocabulary } from '@/components/Vocabulary';
 import { GenerateExercises } from '@/components/GenerateExcercises';
 import { Exercises } from '@/components/Exercises';
+import { Theme } from '@/components/Theme';
 
  export default function AudioLearningApp  ()  {
     const {isProcessing, transcriptionData}=useAudioState()
@@ -41,17 +42,9 @@ import { Exercises } from '@/components/Exercises';
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Theme */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                  🎯 Temática
-                </h3>
-                <div className="bg-blue-50 rounded-lg p-3">
-                  <p className="text-blue-800 font-medium">
-                    {transcriptionData?.theme}
-                  </p>
-                </div>
-              </div>
 
+<Theme/>
+            
               {/* Vocabulary */}
               <Vocabulary/>
 
