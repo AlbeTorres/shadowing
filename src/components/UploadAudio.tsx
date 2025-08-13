@@ -6,16 +6,19 @@ import { aiGetAudioTranscription } from '@/AIHelper/aiAudioProcesser';
 export const UploadAudio = () => {
   const { 
     audioFile, 
+    youtubeUrl,
     setAudioFile, 
     setAudioUrl, 
     setIsProcessing, 
-    setTranscriptionData 
+    setTranscriptionData,
+    setYoutubeUrl
+
   } = useAudioState();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'file' | 'youtube'>('file');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
+
 
   if (audioFile) {
     return null; // If audio file is already set, don't show the upload component
@@ -63,6 +66,11 @@ export const UploadAudio = () => {
 
   const handleYouTubeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!youtubeUrl) {
+      setError('Por favor ingresa una URL de YouTube válida');
+      return;
+    }
     
     if (!youtubeUrl.trim()) {
       setError('Por favor ingresa una URL de YouTube válida');
@@ -191,7 +199,7 @@ export const UploadAudio = () => {
                 <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="url"
-                  value={youtubeUrl}
+                  value={youtubeUrl ?? ''}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"

@@ -8,9 +8,10 @@ import { Vocabulary } from '@/components/Vocabulary';
 import { GenerateExercises } from '@/components/GenerateExcercises';
 import { Exercises } from '@/components/Exercises';
 import { Theme } from '@/components/Theme';
+import {YoutubePlayer} from '@/components/YoutubePlayer';
 
  export default function AudioLearningApp  ()  {
-    const {isProcessing, transcriptionData}=useAudioState()
+    const {isProcessing}=useAudioState()
  
   
  
@@ -20,6 +21,7 @@ import { Theme } from '@/components/Theme';
   <>
 
         {/* Upload Section */}
+        
        
         <UploadAudio />
        
@@ -34,6 +36,9 @@ import { Theme } from '@/components/Theme';
             <div className="lg:col-span-2 space-y-6">
               {/* Audio Player */}
               <AudioPlayer />
+              <YoutubePlayer/>
+
+
 
               {/* Transcription */}
              <Transcription/>

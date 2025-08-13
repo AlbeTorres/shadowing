@@ -14,11 +14,9 @@ type AudioState = {
   isProcessing: boolean;
   transcriptionData: Transcription | null;
   isGeneratingExercises: boolean;
-
-  // Nuevo: referencia al audio
+  youtubeUrl: string | null;
   audioRef: RefObject<HTMLAudioElement | null> | null;
 
-  // Acciones existentes
   setExercises: (exercises: Exercises) => void;
   setIsGeneratingExercises: (isGenerating: boolean) => void;
   setTranscriptionData: (data: Transcription | null) => void;
@@ -29,8 +27,7 @@ type AudioState = {
   setAudioUrl: (url: string | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setCurrentWordIndex: (index: number) => void;
-
-  // Nuevas acciones
+  setYoutubeUrl: (url: string | null) => void;
   setAudioRef: (ref: RefObject<HTMLAudioElement | null>) => void;
   jumpToTime: (time: number) => void;
 };
@@ -46,9 +43,9 @@ export const useAudioState = create<AudioState>((set, get) => ({
   transcriptionData: null,
   isGeneratingExercises: false,
   exercises: { grammar: [], writing: [] },
+  youtubeUrl: null,
   audioRef: null,
 
-  // Acciones existentes
   setExercises: (exercises) => set({ exercises }),
   setIsGeneratingExercises: (isGenerating) =>
     set({ isGeneratingExercises: isGenerating }),
@@ -60,9 +57,8 @@ export const useAudioState = create<AudioState>((set, get) => ({
   setAudioFile: (file) => set({ audioFile: file }),
   setAudioUrl: (url) => set({ audioUrl: url }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
-
-  // Nuevas acciones
   setAudioRef: (ref) => set({ audioRef: ref }),
+  setYoutubeUrl: (url) => set({ youtubeUrl: url }),
   jumpToTime: (time) => {
     const { audioRef } = get();
     if (audioRef?.current) {

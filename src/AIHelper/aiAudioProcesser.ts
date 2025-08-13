@@ -37,7 +37,8 @@ export async function aiGetAudioTranscription(audioFile: File) {
     console.log("Archivo subido exitosamente:", myfile.uri);
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      // model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash-lite",
       contents: createUserContent([
         createPartFromUri(myfile.uri!, myfile.mimeType!),
         prompt,
@@ -50,39 +51,46 @@ export async function aiGetAudioTranscription(audioFile: File) {
       throw new Error("La IA no devolvió una respuesta válida");
     }
 
-    // Intentar parsear la respuesta JSON
-    let parsedResponse;
-    try {
-      // Limpiar la respuesta en caso de que tenga markdown
-      const cleanedResponse = responseText
-        .replace(/```json\s*/gi, "") // Eliminar ```json al inicio (case insensitive)
-        .replace(/```\s*$/gm, "") // Eliminar ``` al final
-        .replace(/^```/gm, "") // Eliminar ``` al inicio de línea
-        .replace(/```$/gm, "") // Eliminar ``` al final de línea
-        .replace(/^\s*```json/gm, "") // Patrones adicionales
-        .replace(/```\s*$/gm, "") // Patrones adicionales
-        .trim();
+    const parsedResponse = parseTranscription(responseText);
 
-      console.log("Respuesta de la IA:", cleanedResponse);
+    const formattedTranscription = formatTranscription(
+      parsedResponse.transcription
+    );
 
-      parsedResponse = JSON.parse(cleanedResponse);
-    } catch (parseError) {
-      console.error("Error parseando JSON:", parseError);
-      console.log("Respuesta original:", responseText);
+    return {
+      transcription: formattedTranscription,
+      vocabulary: parsedResponse.vocabulary,
+      theme: parsedResponse.theme,
+    };
+  } catch (error) {
+    console.error("Error en aiGetAudioTranscription:", error);
 
-      // Fallback: devolver estructura básica
-      return {
-        transcription: [
-          { start: 0, end: 1, text: "Transcripción", word: "Transcripción" },
-          { start: 1, end: 2, text: "no", word: "no" },
-          { start: 2, end: 3, text: "disponible", word: "disponible" },
-        ],
-        vocabulary: [
-          { word: "audio", definition: "sonido grabado", difficulty: "basic" },
-        ],
-        theme: "Audio procesado",
-      };
-    }
+    throw new Error(
+      `Error procesando audio: ${
+        error instanceof Error ? error.message : "Error desconocido"
+      }`
+    );
+
+    // En caso de error, devolver datos mock para no romper la UI
+  }
+}
+
+function parseTranscription(responseText: string) {
+  try {
+    const cleanedResponse = responseText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*$/gm, "")
+      .replace(/^```/gm, "")
+      .replace(/```$/gm, "")
+      .replace(/^\s*```json/gm, "")
+      .replace(/```\s*$/gm, "")
+      // Eliminar trailing commas
+      .replace(/,(\s*[}\]])/g, "$1")
+      // Eliminar comentarios si los hubiera
+      .replace(/\/\/.*$/gm, "")
+      .trim();
+
+    const parsedResponse = JSON.parse(cleanedResponse);
 
     // Validar estructura de la respuesta
     if (
@@ -95,13 +103,66 @@ export async function aiGetAudioTranscription(audioFile: File) {
 
     return parsedResponse;
   } catch (error) {
-    console.error("Error en aiGetAudioTranscription:", error);
-
-    // En caso de error, devolver datos mock para no romper la UI
-    throw new Error(
-      `Error procesando audio: ${
-        error instanceof Error ? error.message : "Error desconocido"
-      }`
-    );
+    console.error("Error parsing transcription response:", error);
+    // Fallback: devolver estructura básica
+    return {
+      transcription: "Transcripción no disponible",
+      vocabulary: [
+        { word: "audio", definition: "sonido grabado", difficulty: "basic" },
+      ],
+      theme: "Audio procesado",
+    };
   }
+}
+
+function formatTranscription(
+  transcription: string
+): { start: number; text: string }[] {
+  // Promedio de palabras por minuto en inglés (conversacional): ~150-160 WPM
+  // Esto significa aproximadamente 0.4 segundos por palabra
+  const AVERAGE_SECONDS_PER_WORD = 0.4;
+
+  // Limpiar el texto y dividir en palabras
+  const words = transcription
+    .replace(/\s+/g, " ") // Normalizar espacios
+    .trim()
+    .split(" ")
+    .filter((word) => word.length > 0);
+
+  const result: { start: number; text: string }[] = [];
+  let currentTime = 0.01; // Comenzar en 0.01 segundos
+
+  words.forEach((word) => {
+    // Agregar la palabra con el timestamp actual
+    result.push({
+      start: Math.round(currentTime * 100) / 100, // Redondear a 2 decimales
+      text: word,
+    });
+
+    // Calcular duración base de la palabra
+    let wordDuration = AVERAGE_SECONDS_PER_WORD;
+
+    // Ajustar duración según la longitud de la palabra
+    if (word.length <= 3) {
+      wordDuration *= 0.8; // Palabras cortas son más rápidas
+    } else if (word.length >= 8) {
+      wordDuration *= 1.3; // Palabras largas toman más tiempo
+    }
+
+    // Agregar pequeña pausa extra después de puntuación
+    if (/[.!?;:]$/.test(word)) {
+      wordDuration += 0.2 + Math.random() * 0.3; // Pausa de 0.2-0.5 segundos
+    } else if (/[,]$/.test(word)) {
+      wordDuration += 0.1 + Math.random() * 0.2; // Pausa menor para comas
+    }
+
+    // Agregar variación natural (+/- 20%)
+    const variation = 1 + (Math.random() - 0.5) * 0.4;
+    wordDuration *= variation;
+
+    // Actualizar el tiempo actual
+    currentTime += wordDuration;
+  });
+
+  return result;
 }
