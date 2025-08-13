@@ -2,11 +2,13 @@ import { Upload, FileAudio, Youtube, Link } from 'lucide-react';
 import { useAudioState } from '@/store/AudioState';
 import { useRef, useState } from 'react';
 import { aiGetAudioTranscription } from '@/AIHelper/aiAudioProcesser';
+import { getYoutubeVideoTrasncription } from '@/AIHelper/aiGetyoutubeTrasncription';
 
 export const UploadAudio = () => {
   const { 
     audioFile, 
     youtubeUrl,
+    transcriptionData,
     setAudioFile, 
     setAudioUrl, 
     setIsProcessing, 
@@ -20,7 +22,7 @@ export const UploadAudio = () => {
   const [activeTab, setActiveTab] = useState<'file' | 'youtube'>('file');
 
 
-  if (audioFile) {
+  if (audioFile || transcriptionData) {
     return null; // If audio file is already set, don't show the upload component
   }
 
@@ -89,18 +91,18 @@ export const UploadAudio = () => {
       setIsProcessing(true);
       
       // Aquí llamarías a tu función específica para procesar YouTube
-      // const transcriptionResult = await aiGetYouTubeTranscription(youtubeUrl);
-      // setTranscriptionData(transcriptionResult);
+      const transcriptionResult = await getYoutubeVideoTrasncription(youtubeUrl);
+      setTranscriptionData(transcriptionResult);
       
       // Por ahora, como placeholder:
       console.log('Procesando YouTube URL:', youtubeUrl);
       
-      // Simular procesamiento
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // // Simular procesamiento
+      // await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Establecer datos de prueba
-      setAudioFile(new File([], 'youtube-video'));
-      setAudioUrl(youtubeUrl);
+      // // Establecer datos de prueba
+      // setAudioFile(new File([], 'youtube-video'));
+      // setAudioUrl(youtubeUrl);
       
     } catch (err) {
       console.error('Error procesando video de YouTube:', err);

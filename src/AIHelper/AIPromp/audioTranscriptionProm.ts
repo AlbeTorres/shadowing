@@ -1,7 +1,6 @@
 // Crear el prompt para obtener transcripción detallada
 export const prompt = `
     Analiza este audio y proporciona la siguiente información en formato JSON:
-
     {
       "transcription": string,
       "vocabulary": [
@@ -20,6 +19,7 @@ export const prompt = `
     3. Clasifica cada palabra por dificultad
     4. Identifica la temática principal
     5. Responde ÚNICAMENTE con el JSON, sin texto adicional
+    6. Asegúrate de que la transcripcion este completa y no se corte
     `;
 
 // Crear el prompt para obtener transcripción detallada
